@@ -1,122 +1,79 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
+import ProductCard from "./components/ProductCard";
+import { products } from "./data/products";
+import type { CartItem, Product } from "./types/product";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [cart, setCart] = useState<CartItem[]>([]);
+
+  function handleAddToCart(product: Product): void {
+    setCart((previousCart) => {
+      const existingItem = previousCart.find(
+        (item) => item.product.id === product.id,
+      );
+
+      if (existingItem) {
+        return previousCart.map((item) =>
+          item.product.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
+        );
+      }
+
+      return [...previousCart, { product, quantity: 1 }];
+    });
+  }
+
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+    <main className="storefront">
+      <header className="store-header">
+        <a className="store-brand" href="/">
+          ShopSphere
+        </a>
+
+        <nav aria-label="Main navigation">
+          <a href="#products">Products</a>
+          <a href="#about">About</a>
+        </nav>
+
+        <button type="button" className="cart-button">
+          Cart ({cartCount})
         </button>
+      </header>
+
+      <section className="hero-section">
+        <p className="eyebrow">YOUR EVERYDAY STORE</p>
+        <h1>Find something you love.</h1>
+        <p className="hero-description">
+          Discover useful products for your everyday life.
+        </p>
+        <a className="shop-button" href="#products">
+          Explore products
+        </a>
       </section>
 
-      <div className="ticks"></div>
+      <section id="products" className="products-section">
+        <h2>Featured products</h2>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+        <div className="product-grid">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onAddToCart={handleAddToCart}
+            />
+          ))}
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <footer id="about" className="store-footer">
+        ShopSphere — Built with React and TypeScript.
+      </footer>
+    </main>
+  );
 }
 
-export default App
+export default App;
